@@ -1,5 +1,7 @@
 const fs  = require('fs')
-const {duplicate} = require('./streambox')
+const {duplicate,transform} = require('./streambox')
+const { upperCase } = require('voca')
+
 const args = process.argv.slice(2)
 
 const fileName = args[0]
@@ -17,4 +19,7 @@ if (!fs.existsSync(fileName)) {
     process.exit(-1)
 }
 
-duplicate(fileName)
+//duplicate(fileName)ca
+
+transform(fileName,/Chopin/g, upperCase )
+transform(fileName,/Chopin/g, function(str){return str.toUpperCase() }, in_stdout=true)
