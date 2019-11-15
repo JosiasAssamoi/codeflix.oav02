@@ -84,13 +84,14 @@ function csv2json(fileName){
                         line[j]=line[j].replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
                     }
                     else if (headers[j]=='activities'){
-                        line[j]=line[j].split(',').for
+                        line[j]=line[j].split(',').map((str)=> {return str.toLowerCase()})
                     }
                     newObj[headers[j]]=line[j]
                 }
                 myCsv.push(newObj)
             }
         }
+       // envoie dans tstreamm le contenu 
         this.push(JSON.stringify(myCsv,null,'\t')) //
         callback()
         }
@@ -98,6 +99,38 @@ function csv2json(fileName){
     // tunnel to transform puis vers le new file csv
     csvFile.pipe(tstream).pipe(jsonFile)
     jsonFile.on('finish', () => {console.log(`${jsonFileName} succesfully created`)})
+}
+
+function catPipeWc(directory,type,cb){
+       let wordCount = 1 
+
+       let promise = new Promise(function(resolve, reject) {})
+       let files = fs.readdir(directory, (err,items) => {
+
+           return items
+       })
+       console.log(files)
+       files.map(file => {
+            if (path.extname(file) == `.${type}`){
+                let newFile= fs.createReadStream(file)
+                    newFile.on('data', chunck => {
+                        let data = chunck.toString()
+                        wordCount+=data.length
+                    })
+                    newFile.on('end', (chunck) => {
+                        promise = Promise.resolve(wordCount);
+                    })
+            }
+       })
+    
+
+       promise.then(function(value) {
+        console.log(value);
+      });
+  
+
+         
+
 }
 
 
@@ -109,5 +142,5 @@ function csv2json(fileName){
 
 
 module.exports = {
-    duplicate,transform,csv2json
+    duplicate,transform,csv2json,catPipeWc
 }

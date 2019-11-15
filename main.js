@@ -1,5 +1,5 @@
 const fs  = require('fs')
-const {duplicate,transform,csv2json} = require('./streambox')
+const {duplicate,transform,csv2json,catPipeWc} = require('./streambox')
 
 const args = process.argv.slice(2)
 
@@ -22,5 +22,6 @@ if (!fs.existsSync(fileName)) {
 
 //transform(fileName,/Chopin/g, function(str){return str.toUpperCase() } )
 //transform(fileName,/Chopin/g, function(str){return str.toUpperCase() }, in_stdout=true)
-console.log(`launching : ${fileName} ...`)
-csv2json(fileName)
+//console.log(`launching : ${fileName} ...`)
+//csv2json(fileName)
+catPipeWc(".","js",(result) => {console.log(result) })
