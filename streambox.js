@@ -38,7 +38,7 @@ function transform(fileName,re,cb,in_stdout=false){
     let file = fs.createReadStream(fileName)
     let copy = fs.createWriteStream(copyFileName)
 
-    if (in_stdout)
+    if (in_stdout){
         content=''
         file.on('data', chunk => {
             content += chunk.toString().replace(re,cb)
@@ -46,16 +46,58 @@ function transform(fileName,re,cb,in_stdout=false){
         file.on('end',() => {
             console.log(content)
         } )
+    } 
+    else{
+        const tstream = new Transform({
+            transform(chunk,encoding,callback){
+                this.push(chunk.toString().replace(re,cb))
+                callback()
+            }
+        })
+        file.pipe(tstream).pipe(copy)
+    }
 
 
-    const tstream = new Transform({
-        transform(chunk,encoding,callback){
-            this.push(chunk.toString().replace(re,cb))
-            callback()
+
+}
+
+function csv2json(fileName){
+    // create the read stream 
+    let csvFile = fs.createReadStream(fileName)
+    // nom du fichier que l'on va create
+    const jsonFileName = `${path.basename(fileName, path.extname(fileName))}.json`
+    // create the write stream
+    let jsonFile = fs.createWriteStream(jsonFileName)
+    // create the transform stream 
+    const tstream= new Transform({transform(chunk,econding,callback){
+        let chunkString = chunk.toString().split('\n')
+        const headers = chunkString[0].split(';')
+        let myCsv = []
+        for (let i = 1 ; i < chunkString.length ;  i++){
+            // check si not empty 
+            if(chunkString[i]){
+                // get elts de la line 
+                let line = chunkString[i].split(';')
+                newObj = {}
+                for(let j =0 ; j <headers.length; j++ ){
+                    if(['birth','death'].includes(headers[j])){
+                        line[j]=line[j].replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
+                    }
+                    else if (headers[j]=='activities'){
+                        line[j]=line[j].split(',').for
+                    }
+                    newObj[headers[j]]=line[j]
+                }
+                myCsv.push(newObj)
+            }
         }
- 
+        this.push(JSON.stringify(myCsv,null,'\t')) //
+        callback()
+        }
     })
-    file.pipe(tstream).pipe(copy)
+    // tunnel to transform puis vers le new file csv
+    csvFile.pipe(tstream).pipe(jsonFile)
+    jsonFile.on('finish', () => {console.log(`${jsonFileName} succesfully created`)})
 }
 
 
@@ -65,6 +107,7 @@ function transform(fileName,re,cb,in_stdout=false){
 
 
 
+
 module.exports = {
-    duplicate,transform
+    duplicate,transform,csv2json
 }

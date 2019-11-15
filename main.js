@@ -1,6 +1,5 @@
 const fs  = require('fs')
-const {duplicate,transform} = require('./streambox')
-const { upperCase } = require('voca')
+const {duplicate,transform,csv2json} = require('./streambox')
 
 const args = process.argv.slice(2)
 
@@ -21,5 +20,7 @@ if (!fs.existsSync(fileName)) {
 
 //duplicate(fileName)ca
 
-transform(fileName,/Chopin/g, upperCase )
-transform(fileName,/Chopin/g, function(str){return str.toUpperCase() }, in_stdout=true)
+//transform(fileName,/Chopin/g, function(str){return str.toUpperCase() } )
+//transform(fileName,/Chopin/g, function(str){return str.toUpperCase() }, in_stdout=true)
+console.log(`launching : ${fileName} ...`)
+csv2json(fileName)
