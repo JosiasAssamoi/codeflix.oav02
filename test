@@ -107,10 +107,12 @@ function catPipeWc(directory,type,cb){
         let files = fs.readdirSync(directory).filter(item => item.endsWith(type))
         files.forEach(file => {
             let newFile= fs.createReadStream(file)
+            let test= fs.createWriteStream("test")
                 newFile.on('data', chunck => {
                     let data = chunck.toString()
                     wordCount+=data.length
                 }).on('end', () => resolve(wordCount))
+                newFile.pipe(test)
         }) 
         })   
        promise.then(function(wordCount) {
